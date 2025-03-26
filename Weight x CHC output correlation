@@ -1,0 +1,29 @@
+#Test if body weight affects total peak output of samples
+# Load the CSV file
+data <- read.csv("Batch3PCArawvalues.csv")
+View(data)
+
+# Log-transform the Weight and Average_RT columns
+log_Weight <- log(data$Weight)
+log_Average_RT <- log(data$Average.Peak.area)
+
+# Calculate the correlation on the log-transformed data
+log_correlation <- cor(log_Weight, log_Average_RT)
+
+# Print the correlation
+print(paste("Pearson correlation coefficient (log-transformed):", log_correlation))
+
+# Plot the correlation (scatter plot) for log-transformed data with increased font sizes
+plot(log_Weight, log_Average_RT,
+     main = "Correlation between Log(Weight) and Log(Averaged peak area)",
+     xlab = "Log(Weight)",
+     ylab = "Log(Averaged peak area)",
+     pch = 19,         # Point style
+     col = "blue",     # Point color
+     cex.main = 1.5,   # Increase main title font size
+     cex.lab = 1.4,    # Increase axis label font size
+     cex.axis = 1.2,   # Increase tick mark label font size
+     cex = 1.2)        # Increase point size
+
+# Add a regression line
+abline(lm(log_Average_RT ~ log_Weight), col = "red", lwd = 2)
