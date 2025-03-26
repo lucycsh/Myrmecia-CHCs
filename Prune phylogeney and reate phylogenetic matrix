@@ -1,0 +1,133 @@
+
+#Prune phylogeny for our species only, create phylogenetic matrix
+library(ape)
+
+#set working directory
+setwd ("/Users/lucy/Desktop/Honours Project!/Data")
+
+# Replace 'your_file.txt' with the path to your .txt file containing the Newick string
+file_path <- ("~/Desktop/Honours Project!/Data/Phylogeny_Newick.txt")
+
+# Read the Newick string from the file
+newick_string <- readLines(file_path)
+
+# Create the phylogeny
+phylo_tree <- read.tree(text = newick_string)
+
+# Print the phylogeny
+print(phylo_tree)
+
+plot(phylo_tree)
+
+# Generate the distance matrix
+distance_matrix <- cophenetic(phylo_tree)
+
+# Print the distance matrix
+print(distance_matrix)
+
+
+# Read the Newick string from the file
+file_path <- "your_file.txt"
+newick_string <- readLines(file_path)
+
+# Create the phylogeny
+phylo_tree <- read.tree(text = newick_string)
+
+# Define the species to keep
+species_to_keep <- c(
+  "Myrmecia_forficata_9831", "Myrmecia_forficata_9845",
+  "Myrmecia_pyriformis_9867",
+  "Myrmecia_simillima_9869", "Myrmecia_simillima_9871", "Myrmecia_simillima_9870",
+  "Myrmecia_desertorum_9828", "Myrmecia_desertorum_9842",
+  "Myrmecia_croslandi_11522",
+  "Myrmecia_nigriceps_11551", "Myrmecia_nigriceps_11552", "Myrmecia_nigriceps_11557", 
+  "Myrmecia_nigriceps_11554", "Myrmecia_nigriceps_9856", "Myrmecia_nigriceps_9834", 
+  "Myrmecia_nigriceps_9857",
+  "Myrmecia_nigrocinta_9859", "Myrmecia_nigrocinta_9858",
+  "Myrmecia_tarsata_9872", "Myrmecia_tarsata_9836",
+  "Myrmecia_midas_9855",
+  "Myrmecia_fulvipes_9849", "Myrmecia_fulvipes_9848",
+  "Myrmecia_nigrascapa_11549",
+  "Myrmecia_pilosula_cplx_11502", "Myrmecia_pilosula_cplx_11503", "Myrmecia_pilosula_11523", 
+  "Myrmecia_pilosula_cplx_9898", "Myrmecia_pilosula_cplx_11501", "Myrmecia_pilosula_cplx_9899",
+  "Myrmecia_tepperi_9873",
+  "Myrmecia_mandibularis_9852", "Myrmecia_mandibularis_9853", "Myrmecia_mandibularis_9884",
+  "Myrmecia_froggatti_9846", "Myrmecia_froggatti_11534"
+)
+
+# Prune the tree to include only the specified species
+pruned_tree <- drop.tip(phylo_tree, setdiff(phylo_tree$tip.label, species_to_keep))
+
+# Print the pruned phylogeny
+print(pruned_tree)
+
+# Plot the pruned phylogeny
+plot(pruned_tree)
+
+# Define a mapping from sample names to species names
+sample_to_species <- c(
+  Myrmecia_forficata_9831 = "Myrmecia_forficata",
+  Myrmecia_forficata_9845 = "Myrmecia_forficata",
+  Myrmecia_pyriformis_9867 = "Myrmecia_pyriformis",
+  Myrmecia_simillima_9869 = "Myrmecia_simillima",
+  Myrmecia_simillima_9871 = "Myrmecia_simillima",
+  Myrmecia_simillima_9870 = "Myrmecia_simillima",
+  Myrmecia_desertorum_9828 = "Myrmecia_desertorum",
+  Myrmecia_desertorum_9842 = "Myrmecia_desertorum",
+  Myrmecia_croslandi_11522 = "Myrmecia_croslandi",
+  Myrmecia_nigriceps_11551 = "Myrmecia_nigriceps",
+  Myrmecia_nigriceps_11552 = "Myrmecia_nigriceps",
+  Myrmecia_nigriceps_11557 = "Myrmecia_nigriceps",
+  Myrmecia_nigriceps_11554 = "Myrmecia_nigriceps",
+  Myrmecia_nigriceps_9856 = "Myrmecia_nigriceps",
+  Myrmecia_nigriceps_9834 = "Myrmecia_nigriceps",
+  Myrmecia_nigriceps_9857 = "Myrmecia_nigriceps",
+  Myrmecia_nigrocinta_9859 = "Myrmecia_nigrocinta",
+  Myrmecia_nigrocinta_9858 = "Myrmecia_nigrocinta",
+  Myrmecia_tarsata_9872 = "Myrmecia_tarsata",
+  Myrmecia_tarsata_9836 = "Myrmecia_tarsata",
+  Myrmecia_midas_9855 = "Myrmecia_midas",
+  Myrmecia_fulvipes_9849 = "Myrmecia_fulvipes",
+  Myrmecia_fulvipes_9848 = "Myrmecia_fulvipes",
+  Myrmecia_nigrascapa_11549 = "Myrmecia_nigrascapa",
+  Myrmecia_pilosula_cplx_11502 = "Myrmecia_pilosula_cplx",
+  Myrmecia_pilosula_cplx_11503 = "Myrmecia_pilosula_cplx",
+  Myrmecia_pilosula_11523 = "Myrmecia_pilosula",
+  Myrmecia_pilosula_cplx_9898 = "Myrmecia_pilosula_cplx",
+  Myrmecia_pilosula_cplx_11501 = "Myrmecia_pilosula_cplx",
+  Myrmecia_pilosula_cplx_9899 = "Myrmecia_pilosula_cplx",
+  Myrmecia_tepperi_9873 = "Myrmecia_tepperi",
+  Myrmecia_mandibularis_9852 = "Myrmecia_mandibularis",
+  Myrmecia_mandibularis_9853 = "Myrmecia_mandibularis",
+  Myrmecia_mandibularis_9884 = "Myrmecia_mandibularis",
+  Myrmecia_froggatti_9846 = "Myrmecia_froggatti",
+  Myrmecia_froggatti_11534 = "Myrmecia_froggatti"
+)
+
+# Rename the tips according to the species mapping
+phylo_tree$tip.label <- sapply(phylo_tree$tip.label, function(x) sample_to_species[x])
+
+# List of species to keep
+species_to_keep <- unique(unname(sample_to_species))
+
+# Find tips to keep
+tips_to_keep <- which(phylo_tree$tip.label %in% species_to_keep)
+
+# Prune the tree to include only the specified species
+pruned_tree <- drop.tip(phylo_tree, setdiff(phylo_tree$tip.label, phylo_tree$tip.label[tips_to_keep]))
+
+# Print the pruned phylogeny
+print(pruned_tree)
+
+# Plot the pruned phylogeny
+plot(pruned_tree)
+
+#Create the phylogenetic distance matrix
+pruned_tree <- drop.tip(phylo_tree, setdiff(phylo_tree$tip.label, phylo_tree$tip.label[tips_to_keep]))
+
+# Compute the phylogenetic distance matrix
+phylo_dist_matrix <- cophenetic(pruned_tree)
+
+# Print the distance matrix
+print(phylo_dist_matrix)
+
