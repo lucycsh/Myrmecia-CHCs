@@ -1,0 +1,170 @@
+
+#Create geographical distance matrix for pilosula, and conduct mantel test
+#install geosphere
+install.packages("geosphere")
+library(geosphere)
+
+pil_geo_data<-read.csv("pilosula nest coordinates.csv",header=TRUE)
+View(pil_geo_data)
+
+
+#create a geographic distances matrix
+
+#check csv formatting has seperate lattitude and longitude columns
+str(pil_geo_data)
+head(pil_geo_data)
+
+# Display the names of the columns in pil_geo_data
+colnames(pil_geo_data)
+
+### COLUMN NAMES ARE CASE SENSITIVE
+# Replace 'Lat' and 'Lon' with the actual names from your data
+coordinates <- data.frame(lon = pil_geo_data$Longitude, lat = pil_geo_data$Latitude)
+
+# Check the contents of the coordinates dataframe
+print(coordinates)
+
+# Assuming 'SampleID' is the column with unique identifiers for each sample
+rownames(coordinates) <- pil_geo_data$Nest
+
+# Compute the distance matrix (in meters)
+geo_distance_matrix <- distm(coordinates[, c("lon", "lat")], fun = distHaversine)
+
+
+
+# Set the row and column names for the distance matrix
+rownames(geo_distance_matrix) <- rownames(coordinates)
+colnames(geo_distance_matrix) <- rownames(coordinates)
+
+# View the resulting distance matrix
+View(geo_distance_matrix)
+
+##Creating a matrix for the PCA centroids only
+# Assuming you already have the PCA results in the data frame 'pilosulapcadata' and the 'Nest' column
+# Add the 'Nest' data to the PCA data frame if it's not already included
+pilosulapcadata$Nest <- pilosula$Nest
+
+# Retain 'Nest' names as row names
+rownames(pilosulacentroids) <- pilosulacentroids$Nest
+
+# Remove the 'Nest' column from the centroid data for distance calculations
+centroid_coordinates <- pilosulacentroids[, -1]  # Assuming the first column is 'Nest'
+
+# Calculate the Euclidean distance matrix based on the centroids
+distance_matrix <- dist(centroid_coordinates, method = "euclidean")
+
+# Convert distance matrix to a matrix and assign row and column names as 'Nest'
+distance_matrix <- as.matrix(distance_matrix)
+rownames(distance_matrix) <- pilosulacentroids$Nest
+colnames(distance_matrix) <- pilosulacentroids$Nest
+
+# Print the distance matrix with Nest names
+print(distance_matrix)
+
+library(permute)
+library(lattice)
+
+##Creating the mantel test##
+
+# Ensure geo_distance_matrix_km and distance_matrix are available
+# Assuming these matrices are based on common samples
+
+# Convert matrices to 'dist' objects if they are not already
+geo_distance_object <- as.dist(geo_distance_matrix)
+chemical_distance_object <- as.dist(distance_matrix)
+
+# Print the distance objects to ensure they're correctly formatted
+print(geo_distance_object)
+print(chemical_distance_object)
+
+# Extract sample names from both matrices (use attr to ensure labels are present)
+samples_geo <- attr(geo_distance_object, "Labels")
+samples_chemical <- attr(chemical_distance_object, "Labels")
+
+# Find common samples between both matrices (optional, depending on your data)
+common_samples <- intersect(samples_geo, samples_chemical)
+
+# Filter the distance matrices to only include the common samples
+geo_distance_matrix_common <- as.dist(as.matrix(geo_distance_object)[common_samples, common_samples])
+chemical_distance_matrix_common <- as.dist(as.matrix(chemical_distance_object)[common_samples, common_samples])
+
+# Perform the Mantel test
+library(vegan)
+mantel_result <- mantel(geo_distance_matrix_common, chemical_distance_matrix_common)
+
+# Print the Mantel test results
+print(mantel_result)
+
+##convert to kilometers
+# Convert meters to kilometers (assuming your matrices are in meters)
+geo_distance_matrix_km <- geo_distance_matrix / 1000
+chemical_distance_matrix_km <- distance_matrix / 1000
+
+# Convert matrices to 'dist' objects if they are not already
+geo_distance_object <- as.dist(geo_distance_matrix_km)
+chemical_distance_object <- as.dist(chemical_distance_matrix_km)
+
+# Extract sample names from both matrices (use attr to ensure labels are present)
+samples_geo <- attr(geo_distance_object, "Labels")
+samples_chemical <- attr(chemical_distance_object, "Labels")
+
+# Find common samples between both matrices
+common_samples <- intersect(samples_geo, samples_chemical)
+
+# Filter the distance matrices to only include the common samples
+geo_distance_matrix_common <- as.dist(as.matrix(geo_distance_object)[common_samples, common_samples])
+chemical_distance_matrix_common <- as.dist(as.matrix(chemical_distance_object)[common_samples, common_samples])
+
+# Perform the Mantel test
+library(vegan)
+mantel_result <- mantel(geo_distance_matrix_common, chemical_distance_matrix_common)
+
+# Print the Mantel test results
+print(mantel_result)
+
+# Create a scatterplot to visualize the relationship between geographical and chemical distances
+geo_dist_values <- as.vector(as.matrix(geo_distance_matrix_common))
+chemical_dist_values <- as.vector(as.matrix(chemical_distance_matrix_common))
+
+plot(geo_dist_values, chemical_dist_values,
+     xlab = "Geographical Distance (km)",    # Update x-axis to reflect kilometers
+     ylab = "Chemical Distance" ,        # Update y-axis label accordingly
+     main = "Scatterplot of Geographical vs Chemical Distances",
+     pch = 19, col = "blue")
+
+# Optionally, add a trendline to the scatterplot
+abline(lm(chemical_dist_values ~ geo_dist_values), col = "red")
+
+
+
+# Convert the distance matrices to vectors for plotting
+geo_distances <- as.vector(geo_distance_matrix_common)
+chemical_distances <- as.vector(chemical_distance_matrix_common)
+
+# Create a scatterplot of the distances
+plot(geo_distances, chemical_distances,
+     xlab = "Geographic Distance (m)",
+     ylab = "Chemical Distance (PCA)",
+     main = "Scatterplot of Chemical Distances vs Geographic Distances",
+     pch = 19,        # Solid circles for points
+     col = "blue",    # Color the points blue
+     xaxt = "n")      # Suppress the default x-axis
+
+# Add custom x-axis with whole numbers and commas
+axis(1, at = pretty(geo_distances), labels = format(pretty(geo_distances), big.mark = ","))
+
+# Optionally, add a regression line
+abline(lm(chemical_distances ~ geo_distances), col = "red")
+
+
+# Display Mantel test result on the plot
+text(x = min(geo_distances), 
+     y = max(chemical_distances), 
+     labels = paste("Mantel r:", round(mantel_result$statistic, 3), 
+                    "\nP-value:", round(mantel_result$signif, 3)),
+     pos = 3, col = "blue")
+
+
+
+
+
