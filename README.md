@@ -13,7 +13,7 @@ Ants, cuticular hydrocarbons, chemical communication, Myrmecia, signal evolution
 
 # R scripts overview
 
-## Ant weight x CHC peak output R code
+## <a name="Weight-x-CHC-output-correlation-R-code"></a>
 + To determine if an individual ant's weight correlated with its overall CHC peak size output
 
 ## PERMANOVA, PCA and Chemical distance matrix for all species' CHCs
