@@ -1,0 +1,162 @@
+### convert raw data values into relative values, then into presence absence data, filtering >0.05
+
+# Load required library
+library(dplyr)
+
+
+# Read in the CSV file
+data <- read.csv("~/Library/CloudStorage/OneDrive-DeakinUniversity/Desktop/Student's work/Lucy/Batch3PCArawvalues.csv")
+
+# Load required library
+library(dplyr)
+
+setwd ("/Users/lucy/Desktop/Honours Project!/Data")
+# Read in the CSV file
+data <- read.csv("Batch3PCArawvalues.csv")
+
+# Normalize the GC data (continuous columns after the first five)
+normalized_data <- data %>%
+  rowwise() %>%
+  mutate(across(6:ncol(data), ~ .x / max(c_across(6:ncol(data)), na.rm = TRUE))) %>%
+  ungroup()
+
+# Remove columns where all values are <= 0.05 in the GC columns
+filtered_data <- normalized_data %>%
+  select(1:5, where(~ any(. > 0.05)))
+
+# Convert GC data into presence (1) or absence (0) in the filtered dataset
+presence_absence_filtered_data <- filtered_data %>%
+  mutate(across(6:ncol(filtered_data), ~ ifelse(.x > 0.05, 1, 0)))
+
+# Remove the "Sample", "Site", "Label", and "Nest" columns, keeping "Species" and GC data
+final_data <- presence_absence_filtered_data %>%
+  select(Species, starts_with("X"))  # Adjust for GC data columns if they start with certain prefixes
+
+# Write the final data to a new CSV (optional)
+write.csv(final_data, "final_presence_absence_GC_data_with_species.csv", row.names = FALSE)
+
+# Group by "Species" and summarize the data to indicate presence if any row had a presence (1)
+species_presence_absence <- final_data %>%
+  group_by(Species) %>%
+  summarise(across(everything(), ~ ifelse(any(. == 1), 1, 0)))
+
+# Write the species-level presence/absence data to a new CSV (optional)
+write.csv(species_presence_absence, "species_level_presence_absence_GC_data.csv", row.names = FALSE)
+
+# Calculate the binary squared Euclidean distance matrix
+binary_squared_euclidean <- dist(PA_data[, -1], method = "euclidean")^2
+
+# Convert the distance object into a matrix
+PA_matrix <- as.matrix(binary_squared_euclidean)
+
+# Add row and column names (species names) to the matrix
+rownames(PA_matrix) <- PA_data$Species
+colnames(PA_matrix) <- PA_data$Species
+
+# Write the distance matrix to a CSV file (optional)
+write.csv(PA_matrix, "binary_squared_euclidean_distance_matrix.csv")
+
+print(PA_matrix)
+
+View(PA_matrix)
+
+#Create a matrix of the presence absence species data
+
+library(dplyr)
+library(proxy)
+
+PAdata<-read.csv("PA_0.05.csv",header=TRUE)
+View(PAdata)
+
+# Retain the species column
+species_names <- PAdata[, 1]
+
+# Convert the remaining columns to binary
+PAdata_binary <- PAdata[, -1,]  # Exclude the first column
+
+PAdata_binary[PAdata_binary == 'Y'] <- 1
+PAdata_binary[PAdata_binary == 'N'] <- 0
+
+# Convert the data frame to numeric
+PAdata_binary <- as.data.frame(lapply(PAdata_binary, function(x) {
+  as.numeric(as.character(x))
+}))
+
+# Add the species names back to the first column
+PAdata_binary <- cbind(Species = species_names, PAdata_binary)
+
+# View the final binary data
+View(PAdata_binary)
+
+# Aggregate the binary data by species using the updated syntax
+species_aggregated_data <- PAdata_binary %>%
+  group_by(Species) %>%
+  summarise(across(everything(), \(x) max(x, na.rm = TRUE)))
+
+View(species_aggregated_data)
+
+# Convert the species_aggregated_data to a matrix
+species_matrix <- as.matrix(species_aggregated_data[, -1])  # Exclude the Species column
+
+# Calculate the binary squared Euclidean distance matrix
+distance_matrix_0.05 <- proxy::dist(species_matrix, method = "Euclidean")^2
+
+# Convert the distance object to a matrix
+distance_matrix_0.05 <- as.matrix(distance_matrix_0.05)
+
+# Add species names as row and column names
+rownames(distance_matrix_0.05) <- colnames(distance_matrix_0.05) <- species_aggregated_data$Species
+
+# View the binary squared Euclidean distance matrix
+View(distance_matrix_0.05)
+
+# Optionally, print the matrix
+print("Binary Squared Euclidean Distance Matrix:")
+print(distance_matrix_0.05)
+
+
+# Assuming PAdata_binary is the binary presence/absence data with Species as the first column
+# Optionally, print the result
+print("Aggregated Data where 1 indicates presence across any individual in the species:")
+print(species_aggregated_data)
+
+# Convert the species_aggregated_data to a matrix
+species_matrix <- as.matrix(species_aggregated_data[, -1])  # Exclude the Species column
+
+# Set the row names of the matrix to be the species names
+rownames(species_matrix) <- species_aggregated_data$Species
+
+# View the resulting matrix
+View(species_matrix)
+
+# Optionally, print the matrix
+print("Species Aggregated Data Matrix:")
+print(species_matrix)
+
+# Remove the 16th row (Sp.17) from the matrix for mantel test
+species_matrix <- species_matrix[-16, ]
+
+# View the modified matrix
+View(species_matrix)
+
+# Optionally, print the matrix to verify the removal
+print("Species Aggregated Data Matrix without the 16th row:")
+print(species_matrix)
+
+# Calculate the binary squared Euclidean distance matrix
+PA_matrix <- proxy::dist(species_matrix, method = "Euclidean")^2
+
+# Convert the distance object to a matrix
+PA_matrix <- as.matrix(PA_matrix)
+
+# Add species names as row and column names
+rownames(PA_matrix) <- colnames(PA_matrix) <- rownames(species_matrix)
+
+# View the distance matrix
+View(PA_matrix)
+
+# Optionally, print the distance matrix
+print("Binary Squared Euclidean Distance Matrix without the 16th species:")
+print(PA_matrix)
+
+
