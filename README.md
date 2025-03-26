@@ -13,21 +13,29 @@ Ants, cuticular hydrocarbons, chemical communication, Myrmecia, signal evolution
 
 # R scripts overview
 
-## <a name="Weight-x-CHC-output-correlation-R-code"></a>
+## 1. Weight x CHC output correlation R code
 + To determine if an individual ant's weight correlated with its overall CHC peak size output
 
-## PERMANOVA, PCA and Chemical distance matrix for all species' CHCs
+## 2. PERMANOVA, PCA and Chemical distance matrix for all species' CHCs
++ ANOSIM and PERMANOVA to determine if there are significant differences between species' CHC profiles
++ PCA to visualise those differences between each species and each other species' CHC profile
++ Chemical distance matrix between each ant's CHC profile and each other CHC profile for the Mantel test
 
-## Create presence absence data and matrix
+## 3. Create presence absence data and matrix
++ Convert any compound peak at over 0.5 in the dataset as present, and turn those distances into a matrix to determine if compound abundance affects differences between CHC profiles between species
 
-## Prune phylogeny and create phylogenetic distance matrix
+## 4. Prune phylogeny and create phylogenetic distance matrix
++ Prune total genus phylogeney to only species used in this study, and create phylogenetic distances between each species and every other species for the mantel test
 
-## Mantel tests
-+ For all species chemical distances x phylogenetic distances, and presence absence x phylogenetic distances
+## 5. Mantel tests
++ For all species chemical distances x phylogenetic distances, and presence absence x phylogenetic distances to determine if CHc profiles are correlated with phylogenetic relationships
 
-## *Myrmecia pilsoula* PCA
+## 6. *Myrmecia pilsoula* PCA
++ Extract only *M. pilosula* results from GC-MS data, and conduct PERMANOVa and PCA to see differences in each nests' CHC profile
++ Create chemical distances matrix between each nest
 
-## *Myrmecia pilosula* geographic distance matrix and mantel test
+## 7. *Myrmecia pilosula* geographic distance matrix and mantel test
++ Create distance matrix from *M. pilosula* data and conduct Mantel test with geographical and chemical distances to determine if CHC profiles are affected temporally.
 
 
 
