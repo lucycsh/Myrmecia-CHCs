@@ -1,0 +1,138 @@
+
+#Perform the Mantel test between the species chemical distances (relative amounts) and phylogenetic distances
+
+# Load necessary library
+
+library(vegan)  # For the Mantel test
+
+chemical_distance_data<-read.csv("species_level_presence_absence_GC_data.csv",header=TRUE)
+View (chemical_distance_)
+
+# Assuming you have two distance matrices: chemical_distance_distance_matrix and phylo_dist_matrix)
+View(chemical_distance_matrix)
+View(phylo_dist_matrix))
+
+# Convert them to distance objects (if they aren't already)
+chemical_distance_object <- as.dist(chemical_distance_matrix)
+phylo_object <- as.dist(phylo_dist_matrix))
+
+print(chemical_distance_object)
+print(phylo_object)
+
+# Extract species names from both matrices
+species_chemical_distance <- attr(chemical_distance_object, "Labels")
+species_phylo <- attr(phylo_object, "Labels")
+
+# Find common species between both matrices
+common_species <- intersect(species_chemical_distance, species_phylo)
+
+# View common species
+print(common_species)
+
+
+# Subset the matrices to include only the common species and ensure the order is the same
+chemical_distance_matrix_common <- as.dist(as.matrix(chemical_distance_object)[common_species, common_species])
+phylo_dist_matrix)_common <- as.dist(as.matrix(phylo_object)[common_species, common_species])
+
+print(chemical_distance_matrix_common)
+print(phylo_dist_matrix)_common)
+
+# Perform Mantel test
+mantel_result <- mantel(chemical_distance_matrix_common, phylo_dist_matrix)_common)
+
+# Print Mantel test results
+print(mantel_result)
+
+# Convert the distance matrices to vectors (lower triangle only to avoid duplication)
+chemical_distances <- as.vector(chemical_distance_matrix_common)
+phylo_distances <- as.vector(phylo_dist_matrix)_common)
+
+# Create a scatterplot of the distances with increased text size
+plot(phylo_distances, chemical_distances,
+     xlab = "Phylogenetic Matrix Distances",
+     ylab = "Chemical distances by relative peak heights",
+     main = "Scatterplot of Chemical distances vs Phylogenetic Distances",
+     pch = 19,         # Solid circle for points
+     col = "blue",     # Color of points
+     cex = 1.5,        # Increase size of points
+     cex.axis = 1.5,   # Increase size of axis values
+     cex.lab = 1.5,    # Increase size of axis labels
+     cex.main = 1.8)   # Increase size of title
+
+# Optionally, add a regression line to see the relationship
+abline(lm(chemical_distances ~ phylo_distances), col = "red")
+
+# Display Mantel test result on the plot
+text(x = min(chemical_distances), 
+     y = min(phylo_distances), 
+     labels = chemical_distances("Mantel r:", round(mantel_result$statistic, 3), "\nP-value:", round(mantel_result$signif, 3)),
+     pos = 1, col = "blue")
+
+#Repeat mantel test for compound presence absence matrix and phylogenetic matrix
+
+
+PA_data<-read.csv("presence_absence_filtered_GC_data.csv",header=TRUE)
+View (PA_data)
+
+
+
+# Assuming you have two distance matrices: PA_distance_matrix and phylo_dist_matrix
+View(PA_matrix)
+View(phylo_dist_matrix)
+
+# Convert them to distance objects (if they aren't already)
+PA_object <- as.dist(PA_matrix)
+phylo_object <- as.dist(phylo_dist_matrix)
+
+print(PA_object)
+print(phylo_object)
+
+# Extract species names from both matrices
+species_chemical_distance <- attr(PA_object, "Labels")
+species_phylo <- attr(phylo_object, "Labels")
+
+# Find common species between both matrices
+common_species <- intersect(species_chemical_distance, species_phylo)
+
+# View common species
+print(common_species)
+
+
+# Subset the matrices to include only the common species and ensure the order is the same
+PA_matrix_common <- as.dist(as.matrix(PA_object)[common_species, common_species])
+phylo_dist_matrix_common <- as.dist(as.matrix(phylo_object)[common_species, common_species])
+
+print(PA_matrix_common)
+print(phylo_dist_matrix_common)
+
+# Perform Mantel test
+mantel_result <- mantel(PA_matrix_common, phylo_dist_matrix_common)
+
+# Print Mantel test results
+print(mantel_result)
+
+# Convert the distance matrices to vectors (lower triangle only to avoid duplication)
+chemical_distances <- as.vector(PA_matrix_common)
+phylo_distances <- as.vector(phylo_dist_matrix_common)
+
+# Create a scatterplot of the distances with increased text size
+plot(phylo_distances, chemical_distances,
+     xlab = "Phylogenetic Matrix Distances",
+     ylab = "Presence/absences of compounds",
+     main = "Scatterplot of Presences/absences vs Phylogenetic Distances",
+     pch = 19,         # Solid circle for points
+     col = "blue",     # Color of points
+     cex = 1.5,        # Increase size of points
+     cex.axis = 1.5,   # Increase size of axis values
+     cex.lab = 1.5,    # Increase size of axis labels
+     cex.main = 1.8)   # Increase size of title
+
+# Optionally, add a regression line to see the relationship
+abline(lm(chemical_distances ~ phylo_distances), col = "red")
+
+# Display Mantel test result on the plot
+text(x = min(chemical_distances), 
+     y = min(phylo_distances), 
+     labels = PA_distances("Mantel r:", round(mantel_result$statistic, 3), "\nP-value:", round(mantel_result$signif, 3)),
+     pos = 1, col = "blue")
+
