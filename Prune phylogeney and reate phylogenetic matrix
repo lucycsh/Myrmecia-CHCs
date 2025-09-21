@@ -122,6 +122,14 @@ print(pruned_tree)
 # Plot the pruned phylogeny
 plot(pruned_tree)
 
+# Add bootstrap values to internal nodes
+nodelabels(rootedphylo_tree$node.label, 
+           adj = c(1.2, -0.2),  # adjust placement
+           frame = "none", 
+           cex = 0.7, 
+           col = "black")
+
+
 #Create the phylogenetic distance matrix
 pruned_tree <- drop.tip(phylo_tree, setdiff(phylo_tree$tip.label, phylo_tree$tip.label[tips_to_keep]))
 
